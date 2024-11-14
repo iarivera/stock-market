@@ -30,7 +30,21 @@ class Child1 extends Component {
           <input type="radio" id={options[4]} name="options"></input><label for={options[4]}>{options[4]}</label>
         </div>
         <div className="dropDown">
-
+          Month:
+          <select name="monthSelec">
+            <option>{months[0]}</option>
+            <option>{months[1]}</option>
+            <option>{months[2]}</option>
+            <option>{months[3]}</option>
+            <option>{months[4]}</option>
+            <option>{months[5]}</option>
+            <option>{months[6]}</option>
+            <option>{months[7]}</option>
+            <option>{months[8]}</option>
+            <option>{months[9]}</option>
+            <option selected>{months[10]}</option>
+            <option>{months[11]}</option>
+          </select>
         </div>
       </div>
     );
