@@ -9,10 +9,43 @@ class Child1 extends Component {
 
   componentDidMount() {
     console.log(this.props.csv_data) // Use this data as default. When the user will upload data this props will provide you the updated data
+    this.renderChart();
   }
 
   componentDidUpdate() {
     console.log(this.props.csv_data)
+  }
+
+  renderChart = () => {
+    const parseDate = d3.timeParse('%Y-%m-%d');
+    this.props.csv_data.forEach(d => d.Date = parseDate(d.Date))
+
+    const margin = { top: 50, right: 80, bottom: 60, left: 90},
+      width = 750,
+      height = 450,
+      innerWidth = 750 - margin.left - margin.right,
+      innerHeight = 450 - margin.top - margin.bottom;
+
+    const svg = d3.select('#stocks').attr('width', width).attr('height', height).select('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const xScale = d3.scaleTime().domain(d3.extent(this.props.csv_data, d => d.Date)).range([0, innerWidth]);
+    const yScale = d3.scaleLinear().domain([d3.min(this.props.csv_data, d => d.Low), d3.max(this.props.csv_data, d => d.High)]).range([innerHeight, 0]);
+
+    var highLineGenerator = d3.line()
+    .x(d => xScale(d.Date))
+    .y(d => yScale(d.High)).curve(d3.curveCardinal);
+
+    var lowLineGenerator = d3.line()
+    .x(d => xScale(d.Date))
+    .y(d => yScale(d.Low)).curve(d3.curveCardinal);
+
+    var highPathData = highLineGenerator(this.props.csv_data)
+    svg.selectAll("path").data([highPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'green');
+
+    svg.selectAll('.x.axis').data([null]) .join('g').attr('class', 'x axis').attr('transform', `translate(0,${innerHeight})`);
+    
+    svg.selectAll('.y.axis').data([null]).join('g').attr('class', 'y axis');
   }
 
   render() {
@@ -31,7 +64,7 @@ class Child1 extends Component {
         </div>
         <div className="dropDown">
           Month:
-          <select name="monthSelec">
+          <select name="monthSelect">
             <option>{months[0]}</option>
             <option>{months[1]}</option>
             <option>{months[2]}</option>
@@ -46,6 +79,7 @@ class Child1 extends Component {
             <option>{months[11]}</option>
           </select>
         </div>
+        <svg id="stocks" width="950" height="550"><g transform="translate(300, 110)"></g></svg>
       </div>
     );
   }
