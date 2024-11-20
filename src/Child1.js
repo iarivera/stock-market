@@ -24,6 +24,9 @@ class Child1 extends Component {
     })
     console.log(csv_data)
 
+    const keys = ["Open", "Close"];
+    const colors = { Open: "green", Close: "red" };
+
     const margin = { top: 50, right: 80, bottom: 60, left: 90},
       width = 750,
       height = 450,
@@ -34,24 +37,47 @@ class Child1 extends Component {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     const xScale = d3.scaleTime().domain(d3.extent(this.props.csv_data, d => d.Date)).range([0, innerWidth]);
-    const yScale = d3.scaleLinear().domain([d3.min(this.props.csv_data, d => d.Low), d3.max(this.props.csv_data, d => d.High)]).range([innerHeight, 0]);
+    const yScale = d3.scaleLinear().domain([d3.min(this.props.csv_data, d => d.Close), d3.max(this.props.csv_data, d => d.Open)]).range([innerHeight, 0]);
 
-    var highLineGenerator = d3.line()
+    var openLineGenerator = d3.line()
     .x(d => xScale(d.Date))
-    .y(d => yScale(d.High)).curve(d3.curveCardinal);
+    .y(d => yScale(d.Open)).curve(d3.curveCardinal);
 
-    var lowLineGenerator = d3.line()
+    var closeLineGenerator = d3.line()
     .x(d => xScale(d.Date))
-    .y(d => yScale(d.Low)).curve(d3.curveCardinal);
+    .y(d => yScale(d.Close)).curve(d3.curveCardinal);
 
-    var highPathData = highLineGenerator(this.props.csv_data)
-    var lowPathData = lowLineGenerator(this.props.csv_data)
-    svg.selectAll("path").data([highPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'green');
-    svg.append("path").data([lowPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'red');
+    var openPathData = openLineGenerator(this.props.csv_data)
+    var closePathData = closeLineGenerator(this.props.csv_data)
+    svg.selectAll("path").data([openPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'green');
+    svg.append("path").data([closePathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'red');
 
-    svg.selectAll('.x_axis').data([null]) .join('g').attr('class', 'x_axis').attr('transform', `translate(0,${innerHeight})`).call(d3.axisBottom(xScale));
-    
+    svg.selectAll('.x_axis').data([null]).join('g').attr('class', 'x_axis').attr('transform', `translate(0,${innerHeight})`).call(d3.axisBottom(xScale));
+
     svg.selectAll('.y_axis').data([null]).join('g').attr('class', 'y_axis').call(d3.axisRight(yScale).tickFormat(d => isNaN(d) ? "" : `$${d.toFixed(2)}`));
+
+    const legend = svg
+    .selectAll(".legend")
+    .data(keys)
+    .join("g")
+    .attr("class", "legend")
+    .attr("transform", (d, i) => `translate(0,${i * 20})`);
+
+  legend
+    .append("rect")
+    .attr("x", innerWidth + 10)
+    .attr("y", 0)
+    .attr("width", 15)
+    .attr("height", 15)
+    .attr("fill", (d) => colors[d]);
+
+  legend
+    .append("text")
+    .attr("x", innerWidth + 30)
+    .attr("y", 12)
+    .text((d) => d)
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
   }
 
   render() {
