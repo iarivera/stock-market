@@ -17,8 +17,12 @@ class Child1 extends Component {
   }
 
   renderChart = () => {
-    const parseDate = d3.timeParse('%Y-%m-%d');
-    this.props.csv_data.forEach(d => d.Date = parseDate(d.Date))
+    //const parseDate = d3.timeParse('%Y-%m-%d');
+    const csv_data = this.props.csv_data.map(d => {
+      d.Date = new Date(d.Date)
+      return d;
+    })
+    console.log(csv_data)
 
     const margin = { top: 50, right: 80, bottom: 60, left: 90},
       width = 750,
@@ -41,11 +45,13 @@ class Child1 extends Component {
     .y(d => yScale(d.Low)).curve(d3.curveCardinal);
 
     var highPathData = highLineGenerator(this.props.csv_data)
+    var lowPathData = lowLineGenerator(this.props.csv_data)
     svg.selectAll("path").data([highPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'green');
+    svg.append("path").data([lowPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'red');
 
-    svg.selectAll('.x.axis').data([null]) .join('g').attr('class', 'x axis').attr('transform', `translate(0,${innerHeight})`);
+    svg.selectAll('.x_axis').data([null]) .join('g').attr('class', 'x_axis').attr('transform', `translate(0,${innerHeight})`);
     
-    svg.selectAll('.y.axis').data([null]).join('g').attr('class', 'y axis');
+    svg.selectAll('.y_axis').data([null]).join('g').attr('class', 'y_axis');
   }
 
   render() {
