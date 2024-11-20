@@ -49,9 +49,9 @@ class Child1 extends Component {
     svg.selectAll("path").data([highPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'green');
     svg.append("path").data([lowPathData]).join('path').attr('d', myd => myd).attr('fill', 'none').attr('stroke', 'red');
 
-    svg.selectAll('.x_axis').data([null]) .join('g').attr('class', 'x_axis').attr('transform', `translate(0,${innerHeight})`);
+    svg.selectAll('.x_axis').data([null]) .join('g').attr('class', 'x_axis').attr('transform', `translate(0,${innerHeight})`).call(d3.axisBottom(xScale));
     
-    svg.selectAll('.y_axis').data([null]).join('g').attr('class', 'y_axis');
+    svg.selectAll('.y_axis').data([null]).join('g').attr('class', 'y_axis').call(d3.axisRight(yScale).tickFormat(d => isNaN(d) ? "" : `$${d.toFixed(2)}`));
   }
 
   render() {
